@@ -1,0 +1,14 @@
+### POST request to create a patient
+POST http://localhost:4000/patients/add
+Content-Type: application/json
+
+{
+  "name": "Thusitha Kithuldora",
+  "address": "90/3/E, Kahanthota Road, Malabe",
+  "dateOfBirth": "2001-08-01",
+  "email": "me@thusithakit.com",
+  "registeredDate": "2026-09-12"
+
+}
+
+###
