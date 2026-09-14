@@ -4,6 +4,7 @@ import com.thusithakit.patientservice.dto.PatientRequestDTO;
 import com.thusithakit.patientservice.dto.PatientResponseDTO;
 import com.thusithakit.patientservice.exception.EmailAlreadyExistException;
 import com.thusithakit.patientservice.exception.PatientNotFoundException;
+import com.thusithakit.patientservice.grpc.BillingServiceGrpcClient;
 import com.thusithakit.patientservice.mapper.PatientMapper;
 import com.thusithakit.patientservice.model.Patient;
 import com.thusithakit.patientservice.repository.PatientRepository;
@@ -16,8 +17,11 @@ import java.util.UUID;
 @Service
 public class PatientService {
     private PatientRepository patientRepository;
-    public PatientService(PatientRepository patientRepository) {
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public List<PatientResponseDTO> getPatients () {
@@ -32,6 +36,9 @@ public class PatientService {
             throw new EmailAlreadyExistException("A patient with this email already exists" + patientRequestDTO.getEmail());
         }
         Patient newPatient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
+
+        billingServiceGrpcClient.createBillingAccount(newPatient.getEmail().toString(), newPatient.getName(), newPatient.getEmail());
+
         return PatientMapper.toDTO(newPatient);
     }
 
